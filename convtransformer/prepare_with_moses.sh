@@ -22,8 +22,8 @@ BPE_TOKENS=50000
 src=$1
 tgt=$2
 lang=en-ar
-#orig=/mnt/az_file_share/fayed/data/${src}-${tgt}
-orig=~/data/${src}-${tgt}
+orig=/mnt/az_file_share/fayed/data/${src}-${tgt}
+#orig=~/data/${src}-${tgt}
 tmp=$orig/tmp
 NUM_CORES=$(python3 -c "import os; print(os.cpu_count())")
 MAIN_DIRECTORY=$PWD
@@ -39,7 +39,7 @@ echo "skipping ${orig}/$f.$l"
         cat $orig/$f.$src-$tgt.$l | \
             perl $NORM_PUNC $l | \
             perl $REM_NON_PRINT_CHAR | \
-            perl $TOKENIZER -no-escape -threads $NUM_CORES -a -l $l >> $orig/$f.$l
+            perl $TOKENIZER -no-escape -threads $NUM_CORES -a -l $l >> $tmp/$f.$l
   if [ $l = "zh" ] ; then
 	  echo "converting ${f}.${l} content into wubi..."
     mv $orig/$f.$l $tmp/

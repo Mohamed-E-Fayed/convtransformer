@@ -1,8 +1,10 @@
 src=$1
 tgt=$2
 
-TEXT=~/data
-OUTPUTPATH=$TEXT
+DATAPATH=/mnt/az_file_share/fayed/data/${src}-${tgt}
+TEXT=$DATAPATH/tmp
+#TEXT=~/data
+OUTPUTPATH=$DATAPATH/data-bin-character-based
 
 NUM_WORKERS=$(python3 -c "import os; print(os.cpu_count())")
 
