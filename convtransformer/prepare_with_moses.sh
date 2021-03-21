@@ -22,14 +22,15 @@ BPE_TOKENS=50000
 src=$1
 tgt=$2
 lang=en-ar
-orig=/mnt/az_file_share/fayed/data/${src}-${tgt}
-    tmp=$orig/tmp
+#orig=/mnt/az_file_share/fayed/data/${src}-${tgt}
+orig=~/data/${src}-${tgt}
+tmp=$orig/tmp
 NUM_CORES=$(python3 -c "import os; print(os.cpu_count())")
 MAIN_DIRECTORY=$PWD
 
 mkdir -p $tmp
 
-echo "suing moses on data..."
+echo "using moses on data..."
 for l in $src $tgt; do
     for f in train test valid; do
   if test -f "$orig/$f.$l"; then
@@ -38,16 +39,18 @@ echo "skipping ${orig}/$f.$l"
         cat $orig/$f.$src-$tgt.$l | \
             perl $NORM_PUNC $l | \
             perl $REM_NON_PRINT_CHAR | \
-            perl $TOKENIZER -threads $NUM_CORES -a -l $l >> $orig/$f.$l
-  if $l=zh ;then
+            perl $TOKENIZER -no-escape -threads $NUM_CORES -a -l $l >> $orig/$f.$l
+  if [ $l = "zh" ] ; then
+	  echo "converting ${f}.${l} content into wubi..."
     mv $orig/$f.$l $tmp/
     # Using python3 convert_text.py command is influenced by main github repo of convtransformer
     # the make commands are inspired by the wmt-en2wubi repo
-    # I discovered the path below by chance, so I preferred it
-    cd wmt-en2wubi/en2wubi/en2wubi/scripts/
-    python3 convert_text.py   --input-doc $tmp/$f.$l  --output-doc $orig/$f.$l --convert-type ch2wb
-cd $MAIN_DIRECTORY #return to convtransformer/convtransformer directory
-    #make convert-cn2wb IN=$tmp/$f.$l  OUT=$orig/$f.$l # CN2WB
+    cd wmt-en2wubi/en2wubi
+    #CONVERT_INTO_WUBI_SCRIPT_PATH=wmt-en2wubi/en2wubi/en2wubi
+    #cd $CONVERT_INTO_WUBI_SCRIPT_PATH
+    #python3 ./scripts/convert_text.py   --input-doc $tmp/$f.$l  --output-doc $orig/$f.$l --convert-type en2wb
+    make convert-cn2wb IN=$tmp/$f.$l  OUT=$orig/$f.$l # CN2WB
+    cd $MAIN_DIRECTORY #return to convtransformer/convtransformer directory
   fi
     fi
 done
